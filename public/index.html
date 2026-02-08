@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset = "utf-8" />
+        <meta name = "viewport" content = "width=device-width, initial scale = 1" />
+        <title>cf_ai_queue_assistant app</title>
+        <style>
+            body { font-family: system-ui, sans-serif; margin: 24px; max-width: 720px; }
+            #log { border: 1px solid #ddd; padding: 12px; height: 320px; overflow: auto; white-space: pre-wrap; }
+            form { display: flex; gap: 8px; margin-top: 12px; }
+            input { flex: 1; padding: 10px; }
+            button { padding: 10px 14px; }
+        </style>
+    </head>
+
+    <body>
+    <h1>AI Queue Assistant</h1>
+    <div id="log"></div>
+
+    <form id="chatForm">
+      <input id="msg" placeholder="Type: enqueue, list, work..." autocomplete="off" />
+      <button type="submit">Send</button>
+    </form>
+
+    <script>
+      const logEl = document.getElementById("log");
+      const formEl = document.getElementById("chatForm");
+      const msgEl = document.getElementById("msg");
+
+      function appendLine(who, text) {
+        logEl.textContent += `${who}: ${text}\n`;
+        logEl.scrollTop = logEl.scrollHeight;
+      }
+
+      formEl.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const message = msgEl.value.trim();
+        if (!message) return;
+
+        appendLine("you", message);
+        msgEl.value = "";
+
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message }),
+        });
+
+        if (!res.ok) {
+          appendLine("system", `error: ${res.status} ${res.statusText}`);
+          return;
+        }
+
+        const data = await res.json();
+        appendLine("bot", data.reply ?? "(no reply)");
+      });
+    </script>
+  </body>
+</html>
