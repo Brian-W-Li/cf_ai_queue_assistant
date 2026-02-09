@@ -69,7 +69,7 @@ Prerequisites
 - Wrangler
 
 To run the code:
-- ```bash
+- run bash
 - git clone <repoURL>
 - cd cf_ai_queue_assistant
 - npm install
